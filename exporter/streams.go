@@ -153,7 +153,9 @@ func (e *Exporter) extractStreamMetrics(ch chan<- prometheus.Metric, c redis.Con
 		}
 		info, err := getStreamInfo(c, k.key)
 		if err != nil {
-			log.Errorf("couldn't get info for stream '%s', err: %s", k.key, err)
+			if !strings.HasPrefix(err.Error(), "MOVED") {
+				log.Errorf("couldn't get info for stream '%s', err: %s", k.key, err)
+			}
 			continue
 		}
 		dbLabel := "db" + k.db
